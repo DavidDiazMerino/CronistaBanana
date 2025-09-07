@@ -19,7 +19,25 @@ const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading
     return (
         <div className="text-center p-8 bg-gray-900/50 rounded-lg shadow-2xl shadow-cyan-500/10 backdrop-blur-sm">
             <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-200 mb-4">{APP_TITLE}</h1>
-            <p className="text-lg text-gray-300 mb-8">{APP_DESCRIPTION}</p>
+            <p className="text-lg text-gray-300 mb-6">{APP_DESCRIPTION}</p>
+
+            <div className="text-left max-w-2xl mx-auto text-gray-300 mb-8">
+                <p className="mb-3 font-semibold">Sigue estos pasos:</p>
+                <ol className="list-decimal list-inside space-y-2">
+                    <li>
+                        <strong>Escribe</strong> el nombre de un personaje histórico. Para la demo puedes comenzar con
+                        <em> Blas de Lezo</em>.
+                    </li>
+                    <li>
+                        <strong>Genera</strong> su línea temporal real basada en información histórica curada.
+                    </li>
+                    <li>
+                        <strong>Explora</strong> puntos de divergencia y crea líneas alternativas con imágenes del modelo
+                        <em> Nano Banana</em> de Google Gemini.
+                    </li>
+                </ol>
+            </div>
+
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <input
                     type="text"
