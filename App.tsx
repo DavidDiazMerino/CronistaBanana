@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useReducer } from 'react';
 import type { FullTimelineData, AlternativeTimelineEvent, DivergencePoint, Language } from './types';
-import { generateTimelineData, generateOrEditImage, generateAlternativeTimeline } from './services/geminiService';
+import { generateTimelineData, generateAlternativeTimeline } from './services/geminiService';
+import { loadEventImages } from './utils/imageLoader';
 import { translations } from './i18n';
 import Spinner from './components/Spinner';
 import { ClockIcon, HistoryIcon } from './components/Icons';
@@ -119,25 +120,9 @@ const App: React.FC = () => {
 
         try {
             const data = await generateTimelineData(character, language);
-            dispatch({ type: 'SET', payload: { timelineData: data, imageProgress: { current: 0, total: data.linea_temporal_real.length } } });
+            dispatch({ type: 'SET', payload: { timelineData: data } });
 
-            let prevImage: string | undefined = undefined;
-            let completed = 0;
-            for (const event of data.linea_temporal_real) {
-                dispatch({ type: 'ADD_IMAGE_LOADING', id: event.id });
-                try {
-                    const newImage = await generateOrEditImage(event.prompt_imagen_consistente, prevImage);
-                    dispatch({ type: 'SET_IMAGE', id: event.id, url: newImage });
-                    prevImage = newImage;
-                } catch (err) {
-                    console.error(`Failed to generate image for real event ID ${event.id}:`, err);
-                } finally {
-                    dispatch({ type: 'REMOVE_IMAGE_LOADING', id: event.id });
-                    completed++;
-                    dispatch({ type: 'SET', payload: { imageProgress: { current: completed, total: data.linea_temporal_real.length } } });
-                }
-            }
-            dispatch({ type: 'SET', payload: { imageProgress: null } });
+            await loadEventImages(data.linea_temporal_real, dispatch);
         } catch (err) {
             dispatch({ type: 'SET', payload: { error: err instanceof Error ? err.message : t.unknownError } });
         } finally {
@@ -158,25 +143,9 @@ const App: React.FC = () => {
 
         try {
             const newAlternativeEvents = await generateAlternativeTimeline(characterName, divergencePoint, baseEvent, language);
-            dispatch({ type: 'SET', payload: { activeAlternativeTimeline: newAlternativeEvents, imageProgress: { current: 0, total: newAlternativeEvents.length } } });
+            dispatch({ type: 'SET', payload: { activeAlternativeTimeline: newAlternativeEvents } });
 
-            let prevImage: string | undefined = images[baseEvent.id];
-            let completed = 0;
-            for (const event of newAlternativeEvents) {
-                dispatch({ type: 'ADD_IMAGE_LOADING', id: event.id });
-                try {
-                    const newImage = await generateOrEditImage(event.prompt_imagen_consistente, prevImage);
-                    dispatch({ type: 'SET_IMAGE', id: event.id, url: newImage });
-                    prevImage = newImage;
-                } catch (err) {
-                    console.error(`Failed to generate image for alternative event ID ${event.id}:`, err);
-                } finally {
-                    dispatch({ type: 'REMOVE_IMAGE_LOADING', id: event.id });
-                    completed++;
-                    dispatch({ type: 'SET', payload: { imageProgress: { current: completed, total: newAlternativeEvents.length } } });
-                }
-            }
-            dispatch({ type: 'SET', payload: { imageProgress: null } });
+            await loadEventImages(newAlternativeEvents, dispatch, images[baseEvent.id]);
         } catch (err) {
             dispatch({ type: 'SET', payload: { error: err instanceof Error ? err.message : t.alternativeGenerationError } });
         } finally {
