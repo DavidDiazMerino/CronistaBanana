@@ -1,0 +1,5 @@
+{
+  "name": "Cronista Contrafactual",
+  "description": "An application that generates a historical timeline for a figure, including images, and then creates an alternative, 'what-if' timeline with corresponding visuals.",
+  "requestFramePermissions": []
+}
