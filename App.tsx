@@ -144,11 +144,11 @@ const App: React.FC = () => {
     const imageCardProps = { images, imageLoading };
 
     return (
-        <div className="min-h-screen bg-gray-900 bg-gradient-to-br from-gray-900 via-gray-900 to-cyan-900/40 text-white font-sans relative">
+        <div className="min-h-screen bg-parchment bg-gradient-to-br from-parchment via-parchment to-accent/40 text-sepia font-sans relative">
             <div className="absolute top-4 right-4">
                 <button
                     onClick={() => setLanguage(prev => prev === 'es' ? 'en' : 'es')}
-                    className="px-3 py-1 bg-gray-800 rounded text-sm border border-gray-600 hover:border-cyan-400 transition-colors"
+                    className="px-3 py-1 bg-parchment rounded text-sm border border-gray-600 hover:border-accent transition-colors"
                     aria-label={language === 'es' ? t.switchToEnglish : t.switchToSpanish}
                 >
                     <img
@@ -164,11 +164,11 @@ const App: React.FC = () => {
                 {isLoading && (
                     <div className="mt-12 text-center" role="status" aria-live="polite">
                         <Spinner size="lg" label={t.loading} />
-                        <p className="mt-4 text-gray-300 italic">{loadingMessage}</p>
+                        <p className="mt-4 text-sepia italic">{loadingMessage}</p>
                         {imageProgress && (
                             <>
                                 <progress value={imageProgress.current} max={imageProgress.total} className="mt-4 w-64" />
-                                <p className="mt-2 text-gray-300">{t.imageProgress(imageProgress.current, imageProgress.total)}</p>
+                                <p className="mt-2 text-sepia">{t.imageProgress(imageProgress.current, imageProgress.total)}</p>
                             </>
                         )}
                     </div>
@@ -182,7 +182,7 @@ const App: React.FC = () => {
                             id="real-timeline"
                             className={activeAlternativeTimeline ? 'opacity-40 transition-opacity' : ''}
                         >
-                            <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-cyan-300 flex items-center justify-center gap-3"><ClockIcon className="w-8 h-8"/> {t.realTimeline}</h2>
+                            <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-sepia to-accent flex items-center justify-center gap-3"><ClockIcon className="w-8 h-8"/> {t.realTimeline}</h2>
                             <div className="relative flex flex-col items-center gap-12">
                                 <TimelineNode isLast={!activeAlternativeTimeline} />
                                 {timelineData.linea_temporal_real.map((event, index) => (
@@ -203,11 +203,11 @@ const App: React.FC = () => {
                         {isAlternativeLoading && (
                             <div className="mt-12 text-center" role="status" aria-live="polite">
                                 <Spinner size="lg" label={t.loading} />
-                                <p className="mt-4 text-gray-300 italic">{loadingMessage}</p>
+                                <p className="mt-4 text-sepia italic">{loadingMessage}</p>
                                 {imageProgress && (
                                     <>
                                         <progress value={imageProgress.current} max={imageProgress.total} className="mt-4 w-64" />
-                                        <p className="mt-2 text-gray-300">{t.imageProgress(imageProgress.current, imageProgress.total)}</p>
+                                        <p className="mt-2 text-sepia">{t.imageProgress(imageProgress.current, imageProgress.total)}</p>
                                     </>
                                 )}
                             </div>
@@ -215,7 +215,7 @@ const App: React.FC = () => {
 
                         {activeAlternativeTimeline && (
                             <section id="alternative-timeline" className="mt-16 animate-fade-in">
-                                <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400 flex items-center justify-center gap-3"><HistoryIcon className="w-8 h-8"/> {t.alternativeTimeline}</h2>
+                                <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-accent to-sepia flex items-center justify-center gap-3"><HistoryIcon className="w-8 h-8"/> {t.alternativeTimeline}</h2>
                                 <div className="relative flex flex-col items-center gap-12">
                                     <TimelineNode isLast={true} />
                                     {activeAlternativeTimeline.map((event, index) => (

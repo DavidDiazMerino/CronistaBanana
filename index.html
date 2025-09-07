@@ -8,6 +8,19 @@
     <meta property="og:title" content="Cronista Contrafactual" />
     <meta property="og:description" content="Explora líneas históricas reales y alternativas generadas por IA." />
     <title>Cronista Contrafactual</title>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              parchment: "#f7f1d7",
+              sepia: "#704214",
+              accent: "#c19a6b"
+            }
+          }
+        }
+      };
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @keyframes slide-up {
@@ -38,7 +51,7 @@
 }
 </script>
 </head>
-  <body class="bg-gray-900 text-gray-100">
+  <body class="bg-parchment text-sepia">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
