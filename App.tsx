@@ -1,12 +1,12 @@
 
-import React, { useState, useCallback } from 'react';
-import type { FullTimelineData, TimelineEvent, AlternativeTimelineEvent, DivergencePoint } from './types';
+import React, { useState, useCallback, useEffect } from 'react';
+import type { FullTimelineData, TimelineEvent, AlternativeTimelineEvent, DivergencePoint, Language } from './types';
 import { generateTimelineData, generateOrEditImage, generateAlternativeTimeline } from './services/geminiService';
-import { APP_TITLE, APP_DESCRIPTION } from './constants';
+import { translations, type Translation } from './i18n';
 import Spinner from './components/Spinner';
 import { ClockIcon, BranchIcon, HistoryIcon } from './components/Icons';
 
-const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading: boolean }> = ({ onGenerate, isLoading }) => {
+const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading: boolean; t: Translation }> = ({ onGenerate, isLoading, t }) => {
     const [character, setCharacter] = useState('Blas de Lezo');
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -18,23 +18,15 @@ const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading
 
     return (
         <div className="text-center p-8 bg-gray-900/50 rounded-lg shadow-2xl shadow-cyan-500/10 backdrop-blur-sm">
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-200 mb-4">{APP_TITLE}</h1>
-            <p className="text-lg text-gray-300 mb-6">{APP_DESCRIPTION}</p>
+            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-200 mb-4">{t.appTitle}</h1>
+            <p className="text-lg text-gray-300 mb-6">{t.appDescription}</p>
 
             <div className="text-left max-w-2xl mx-auto text-gray-300 mb-8">
-                <p className="mb-3 font-semibold">Sigue estos pasos:</p>
+                <p className="mb-3 font-semibold">{t.stepsIntro}</p>
                 <ol className="list-decimal list-inside space-y-2">
-                    <li>
-                        <strong>Escribe</strong> el nombre de un personaje histórico. Para la demo puedes comenzar con
-                        <em> Blas de Lezo</em>.
-                    </li>
-                    <li>
-                        <strong>Genera</strong> su línea temporal real basada en información histórica curada.
-                    </li>
-                    <li>
-                        <strong>Explora</strong> puntos de divergencia y crea líneas alternativas con imágenes del modelo
-                        <em> Nano Banana</em> de Google Gemini.
-                    </li>
+                    <li dangerouslySetInnerHTML={{ __html: t.step1 }} />
+                    <li dangerouslySetInnerHTML={{ __html: t.step2 }} />
+                    <li dangerouslySetInnerHTML={{ __html: t.step3 }} />
                 </ol>
             </div>
 
@@ -43,7 +35,7 @@ const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading
                     type="text"
                     value={character}
                     onChange={(e) => setCharacter(e.target.value)}
-                    placeholder="Escribe un personaje histórico"
+                    placeholder={t.placeholder}
                     className="w-full sm:w-80 px-4 py-3 bg-gray-800/70 border-2 border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition duration-300"
                     disabled={isLoading}
                 />
@@ -52,18 +44,18 @@ const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading
                     className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isLoading}
                 >
-                    {isLoading ? <Spinner size="sm" /> : 'Generar Línea Temporal'}
+                    {isLoading ? <Spinner size="sm" /> : t.generateButton}
                 </button>
             </form>
         </div>
     );
 };
 
-const ImageCard: React.FC<{ eventId: number; images: Record<string, string>; imageLoading: Set<number>; prompt: string; }> = ({ eventId, images, imageLoading, prompt }) => {
+const ImageCard: React.FC<{ eventId: number; images: Record<string, string>; imageLoading: Set<number>; prompt: string; errorText: string; }> = ({ eventId, images, imageLoading, prompt, errorText }) => {
     return (
         <div className="aspect-video bg-gray-800/50 rounded-lg flex items-center justify-center overflow-hidden border border-gray-700 shadow-lg">
             {imageLoading.has(eventId) && <Spinner size="md" />}
-            {!imageLoading.has(eventId) && !images[eventId] && <p className="text-gray-500">Error al generar imagen</p>}
+            {!imageLoading.has(eventId) && !images[eventId] && <p className="text-gray-500">{errorText}</p>}
             {images[eventId] && <img src={images[eventId]} alt={prompt} className="w-full h-full object-cover transition-opacity duration-500 opacity-0" onLoad={e => e.currentTarget.style.opacity = '1'} />}
         </div>
     );
@@ -77,7 +69,7 @@ const TimelineNode: React.FC<{ isLast?: boolean }> = ({ isLast = false }) => (
 );
 
 // Fix: Omit 'eventId' from EventCard props as it's derived from the 'event' prop internally.
-const EventCard: React.FC<{ event: TimelineEvent | AlternativeTimelineEvent; divergence?: DivergencePoint; onShowAlternative: (divergence: DivergencePoint) => void; isAlternative?: boolean; } & Omit<React.ComponentProps<typeof ImageCard>, 'prompt' | 'eventId'>> = ({ event, divergence, onShowAlternative, isAlternative = false, ...imageProps }) => {
+const EventCard: React.FC<{ event: TimelineEvent | AlternativeTimelineEvent; divergence?: DivergencePoint; onShowAlternative: (divergence: DivergencePoint) => void; isAlternative?: boolean; t: Translation; } & Omit<React.ComponentProps<typeof ImageCard>, 'prompt' | 'eventId' | 'errorText'>> = ({ event, divergence, onShowAlternative, isAlternative = false, t, ...imageProps }) => {
     const title = 'titulo' in event ? event.titulo : event.titulo_eco;
 
     return (
@@ -85,13 +77,13 @@ const EventCard: React.FC<{ event: TimelineEvent | AlternativeTimelineEvent; div
             <div className="bg-gray-800/30 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-6 transition-all duration-300 hover:border-cyan-400/50 hover:shadow-cyan-500/10">
                 <h3 className="text-2xl font-bold text-cyan-300 mb-2">{title}</h3>
                 <p className="text-gray-300 mb-4">{event.descripcion_corta}</p>
-                <ImageCard prompt={event.prompt_imagen_consistente} eventId={event.id} {...imageProps} />
+                <ImageCard prompt={event.prompt_imagen_consistente} eventId={event.id} errorText={t.imageError} {...imageProps} />
                 {divergence && !isAlternative && (
                     <div className="mt-6 p-4 border-t-2 border-dashed border-gray-600">
-                        <h4 className="text-lg font-semibold text-yellow-300 mb-3 flex items-center"><BranchIcon className="w-5 h-5 mr-2"/> Punto de Divergencia</h4>
+                        <h4 className="text-lg font-semibold text-yellow-300 mb-3 flex items-center"><BranchIcon className="w-5 h-5 mr-2"/> {t.divergenceTitle}</h4>
                         <p className="italic text-gray-400 mb-4">"{divergence.titulo_pregunta}"</p>
                         <button onClick={() => onShowAlternative(divergence)} className="px-4 py-2 bg-yellow-500/20 text-yellow-300 border border-yellow-400 rounded-lg hover:bg-yellow-500/40 transition-colors">
-                            Explorar línea temporal alternativa
+                            {t.exploreAlternative}
                         </button>
                     </div>
                 )}
@@ -109,6 +101,13 @@ const App: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [activeAlternativeTimeline, setActiveAlternativeTimeline] = useState<AlternativeTimelineEvent[] | null>(null);
     const [isAlternativeLoading, setIsAlternativeLoading] = useState(false);
+    const [language, setLanguage] = useState<Language>('es');
+    const t = translations[language];
+
+    useEffect(() => {
+        document.documentElement.lang = language;
+        document.title = t.appTitle;
+    }, [language, t.appTitle]);
 
     const handleGenerateTimeline = async (character: string) => {
         setIsLoading(true);
@@ -119,7 +118,7 @@ const App: React.FC = () => {
         setCharacterName(character);
 
         try {
-            const data = await generateTimelineData(character);
+            const data = await generateTimelineData(character, language);
             setTimelineData(data);
 
             let prevImage: string | undefined = undefined;
@@ -140,7 +139,7 @@ const App: React.FC = () => {
                 }
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An unknown error occurred.");
+            setError(err instanceof Error ? err.message : t.unknownError);
         } finally {
             setIsLoading(false);
         }
@@ -155,13 +154,13 @@ const App: React.FC = () => {
 
         const baseEvent = timelineData.linea_temporal_real.find(e => e.id === divergencePoint.id);
         if (!baseEvent || !images[baseEvent.id]) {
-            setError("No se pudo encontrar el evento base o su imagen para la divergencia.");
+            setError(t.baseEventError);
             setIsAlternativeLoading(false);
             return;
         }
 
         try {
-            const newAlternativeEvents = await generateAlternativeTimeline(characterName, divergencePoint, baseEvent);
+            const newAlternativeEvents = await generateAlternativeTimeline(characterName, divergencePoint, baseEvent, language);
             setActiveAlternativeTimeline(newAlternativeEvents);
 
             let prevImage: string | undefined = images[baseEvent.id];
@@ -182,18 +181,23 @@ const App: React.FC = () => {
                 }
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : "No se pudo generar la línea temporal alternativa.");
+            setError(err instanceof Error ? err.message : t.alternativeGenerationError);
         } finally {
             setIsAlternativeLoading(false);
         }
-    }, [timelineData, characterName, images]);
+    }, [timelineData, characterName, images, language, t.baseEventError, t.alternativeGenerationError]);
 
     const imageCardProps = { images, imageLoading };
 
     return (
-        <div className="min-h-screen bg-gray-900 bg-gradient-to-br from-gray-900 via-gray-900 to-cyan-900/40 text-white font-sans">
+        <div className="min-h-screen bg-gray-900 bg-gradient-to-br from-gray-900 via-gray-900 to-cyan-900/40 text-white font-sans relative">
+            <div className="absolute top-4 right-4">
+                <button onClick={() => setLanguage(prev => prev === 'es' ? 'en' : 'es')} className="px-3 py-1 bg-gray-800 rounded text-sm border border-gray-600 hover:border-cyan-400 transition-colors">
+                    {language === 'es' ? 'EN' : 'ES'}
+                </button>
+            </div>
             <main className="container mx-auto px-4 py-12">
-                <HeroSection onGenerate={handleGenerateTimeline} isLoading={isLoading} />
+                <HeroSection onGenerate={handleGenerateTimeline} isLoading={isLoading} t={t} />
 
                 {isLoading && <div className="mt-12"><Spinner size="lg" /></div>}
 
@@ -202,7 +206,7 @@ const App: React.FC = () => {
                 {timelineData && (
                     <div className="mt-16">
                         <section id="real-timeline">
-                            <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-cyan-300 flex items-center justify-center gap-3"><ClockIcon className="w-8 h-8"/> Línea Temporal Real</h2>
+                            <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-cyan-300 flex items-center justify-center gap-3"><ClockIcon className="w-8 h-8"/> {t.realTimeline}</h2>
                             <div className="relative flex flex-col items-center gap-12">
                                 <TimelineNode isLast={!activeAlternativeTimeline} />
                                 {timelineData.linea_temporal_real.map((event) => (
@@ -211,6 +215,7 @@ const App: React.FC = () => {
                                         event={event}
                                         divergence={timelineData.puntos_divergencia.find(d => d.id === event.id)}
                                         onShowAlternative={handleShowAlternative}
+                                        t={t}
                                         {...imageCardProps}
                                     />
                                 ))}
@@ -221,7 +226,7 @@ const App: React.FC = () => {
 
                         {activeAlternativeTimeline && (
                             <section id="alternative-timeline" className="mt-16 animate-fade-in">
-                                <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400 flex items-center justify-center gap-3"><HistoryIcon className="w-8 h-8"/> Línea Temporal Alternativa</h2>
+                                <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400 flex items-center justify-center gap-3"><HistoryIcon className="w-8 h-8"/> {t.alternativeTimeline}</h2>
                                 <div className="relative flex flex-col items-center gap-12">
                                     <TimelineNode isLast={true} />
                                     {activeAlternativeTimeline.map(event => (
@@ -230,6 +235,7 @@ const App: React.FC = () => {
                                             event={event}
                                             onShowAlternative={() => {}}
                                             isAlternative={true}
+                                            t={t}
                                             {...imageCardProps}
                                         />
                                     ))}

@@ -1,7 +1,7 @@
 
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { GEMINI_PROMPT_PROTOCOL, BLAS_DE_LEZO_BIOGRAPHY } from '../constants';
-import type { FullTimelineData, AlternativeTimelineEvent, DivergencePoint, TimelineEvent } from '../types';
+import type { FullTimelineData, AlternativeTimelineEvent, DivergencePoint, TimelineEvent, Language } from '../types';
 
 if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable is not set");
@@ -79,7 +79,7 @@ const timelineSchema = {
 };
 
 
-export const generateTimelineData = async (character: string): Promise<FullTimelineData> => {
+export const generateTimelineData = async (character: string, lang: Language): Promise<FullTimelineData> => {
     let ragContext = "Usa tu conocimiento interno sobre la biografía del [PERSONAJE_HISTORICO] como fuente de verdad primaria para esta tarea.";
 
     // Use detailed RAG context if the character is Blas de Lezo
@@ -91,10 +91,13 @@ export const generateTimelineData = async (character: string): Promise<FullTimel
         .replace('[CONTEXTO_RAG]', ragContext)
         .replace(/\[PERSONAJE_HISTORICO\]/g, character);
 
+    const languageInstruction = `Devuelve todos los títulos, descripciones y prompts de imagen en ${lang === 'es' ? 'español' : 'inglés'}.`;
+    const fullPrompt = `${prompt}\n\n${languageInstruction}`;
+
     try {
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: prompt,
+            contents: fullPrompt,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: timelineSchema,
@@ -186,7 +189,7 @@ const alternativeTimelineSchema = {
     }
 };
 
-export const generateAlternativeTimeline = async (character: string, divergencePoint: DivergencePoint, lastRealEvent: TimelineEvent): Promise<AlternativeTimelineEvent[]> => {
+export const generateAlternativeTimeline = async (character: string, divergencePoint: DivergencePoint, lastRealEvent: TimelineEvent, lang: Language): Promise<AlternativeTimelineEvent[]> => {
     const prompt = `
         ROL: Eres un "Cronista Contrafactual", un experto en historia y narrativa.
         TAREA: Genera una línea de tiempo alternativa plausible y dramática.
@@ -208,10 +211,13 @@ export const generateAlternativeTimeline = async (character: string, divergenceP
         OUTPUT ESPERADO: Devuelve un único array JSON con los 3 ecos, siguiendo el schema proporcionado.
     `;
 
+    const languageInstruction = `Devuelve todos los títulos, descripciones y prompts de imagen en ${lang === 'es' ? 'español' : 'inglés'}.`;
+    const fullPrompt = `${prompt}\n\n${languageInstruction}`;
+
     try {
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: prompt,
+            contents: fullPrompt,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: alternativeTimelineSchema,
