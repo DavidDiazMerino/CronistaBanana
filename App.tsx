@@ -23,12 +23,27 @@ const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading
 
             <div className="text-left max-w-2xl mx-auto text-gray-300 mb-8">
                 <p className="mb-3 font-semibold">{t.stepsIntro}</p>
-                    <ol className="list-decimal list-inside space-y-2">
-                        <li>{t.step1}</li>
-                        <li>{t.step2}</li>
-                        <li>{t.step3}</li>
-                    </ol>
-                </div>
+                <ol className="list-decimal list-inside space-y-2">
+                    <li className="bg-gray-800/40 border-l-4 border-cyan-500 p-3">
+                        <div className="flex items-start gap-2">
+                            <ClockIcon className="w-5 h-5 text-cyan-400 mt-1" />
+                            <span>{t.step1}</span>
+                        </div>
+                    </li>
+                    <li className="bg-gray-800/40 border-l-4 border-cyan-500 p-3">
+                        <div className="flex items-start gap-2">
+                            <BranchIcon className="w-5 h-5 text-cyan-400 mt-1" />
+                            <span>{t.step2}</span>
+                        </div>
+                    </li>
+                    <li className="bg-gray-800/40 border-l-4 border-cyan-500 p-3">
+                        <div className="flex items-start gap-2">
+                            <HistoryIcon className="w-5 h-5 text-cyan-400 mt-1" />
+                            <span>{t.step3}</span>
+                        </div>
+                    </li>
+                </ol>
+            </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <input
