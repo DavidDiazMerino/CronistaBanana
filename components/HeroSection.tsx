@@ -21,11 +21,11 @@ const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading
 
     return (
         <div className="text-center p-8 bg-parchment/50 rounded-lg shadow-2xl shadow-accent/10 backdrop-blur-sm">
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-200 mb-4">{t.appTitle}</h1>
-            <p className="text-lg text-sepia mb-6">{t.appDescription}</p>
+            <h1 className="text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-200 mb-4">{t.appTitle}</h1>
+            <p className="font-sans text-lg text-sepia mb-6">{t.appDescription}</p>
 
-            <div className="text-left max-w-2xl mx-auto text-sepia mb-8">
-                <p className="mb-3 font-semibold">{t.stepsIntro}</p>
+            <div className="font-sans text-left max-w-2xl mx-auto text-sepia mb-8">
+                <p className="mb-3 font-sans font-semibold">{t.stepsIntro}</p>
                 <ol className="list-decimal list-inside space-y-2">
                     <li className="bg-parchment/40 border-l-4 border-accent p-3">
                         <div className="flex items-start gap-2">
