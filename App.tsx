@@ -4,6 +4,7 @@ import type { FullTimelineData, TimelineEvent, AlternativeTimelineEvent, Diverge
 import { generateTimelineData, generateOrEditImage, generateAlternativeTimeline } from './services/geminiService';
 import { translations, type Translation } from './i18n';
 import Spinner from './components/Spinner';
+import ImageSkeleton from './components/ImageSkeleton';
 import { ClockIcon, BranchIcon, HistoryIcon } from './components/Icons';
 
 const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading: boolean; t: Translation }> = ({ onGenerate, isLoading, t }) => {
@@ -69,10 +70,18 @@ const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading
 
 const ImageCard: React.FC<{ eventId: number; images: Record<string, string>; imageLoading: Set<number>; alt: string; errorText: string; loadingLabel: string; }> = ({ eventId, images, imageLoading, alt, errorText, loadingLabel }) => {
     return (
-        <div className="aspect-video bg-gray-800/50 rounded-lg flex items-center justify-center overflow-hidden border border-gray-700 shadow-lg">
+        <div className="relative aspect-video bg-gray-800/50 rounded-lg flex items-center justify-center overflow-hidden border border-gray-700 shadow-lg">
+            {imageLoading.has(eventId) && <ImageSkeleton />}
             {imageLoading.has(eventId) && <Spinner size="md" label={loadingLabel} />}
             {!imageLoading.has(eventId) && !images[eventId] && <p className="text-gray-500">{errorText}</p>}
-            {images[eventId] && <img src={images[eventId]} alt={alt} className="w-full h-full object-cover transition-opacity duration-500 opacity-0" onLoad={e => e.currentTarget.style.opacity = '1'} />}
+            {images[eventId] && (
+                <img
+                    src={images[eventId]}
+                    alt={alt}
+                    className="w-full h-full object-cover transition-opacity duration-500 opacity-0"
+                    onLoad={(e) => (e.currentTarget.style.opacity = '1')}
+                />
+            )}
         </div>
     );
 };
