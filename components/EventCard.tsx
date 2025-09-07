@@ -42,9 +42,9 @@ const EventCard: React.FC<EventCardProps> = ({
             className={`relative group w-full lg:w-2/3 mx-auto p-4 ${className}`}
             style={style}
         >
-            <div className="bg-gray-800/30 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-6 transition-all duration-300 hover:border-cyan-400/50 hover:shadow-cyan-500/10">
+            <div className="bg-parchment/30 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-6 transition-all duration-300 hover:border-accent/50 hover:shadow-accent/10">
                 <h3 className="text-2xl font-bold text-cyan-300 mb-2">{title}</h3>
-                <p className="text-gray-300 mb-4">{event.descripcion_corta}</p>
+                <p className="text-sepia mb-4">{event.descripcion_corta}</p>
                 <ImageCard
                     eventId={event.id}
                     alt={t.imageAlt(title)}
@@ -55,7 +55,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 {divergence && !isAlternative && (
                     <div className="mt-6 p-4 border-t-2 border-dashed border-gray-600">
                         <h4 className="text-lg font-semibold text-yellow-300 mb-3 flex items-center"><BranchIcon className="w-5 h-5 mr-2"/> {t.divergenceTitle}</h4>
-                        <p className="italic text-gray-400 mb-4">"{divergence.titulo_pregunta}"</p>
+                        <p className="italic text-sepia mb-4">"{divergence.titulo_pregunta}"</p>
                         <button onClick={() => onShowAlternative(divergence)} className="px-4 py-2 bg-yellow-500/20 text-yellow-300 border border-yellow-400 rounded-lg hover:bg-yellow-500/40 transition-colors">
                             {t.exploreAlternative}
                         </button>
