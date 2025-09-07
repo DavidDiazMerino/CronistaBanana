@@ -1,13 +1,23 @@
 
 import { GoogleGenAI, Type, Modality } from "@google/genai";
-import { GEMINI_PROMPT_PROTOCOL, BLAS_DE_LEZO_BIOGRAPHY } from '../constants';
+import { GEMINI_PROMPT_PROTOCOL, BLAS_DE_LEZO_BIOGRAPHY_URL } from '../constants';
 import type { FullTimelineData, AlternativeTimelineEvent, DivergencePoint, TimelineEvent, Language } from '../types';
+import { API_KEY } from '@/config';
 
-if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable is not set");
-}
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+let blasBiographyPromise: Promise<string> | null = null;
+const getBlasDeLezoBiography = async (): Promise<string> => {
+    if (!blasBiographyPromise) {
+        blasBiographyPromise = fetch(BLAS_DE_LEZO_BIOGRAPHY_URL).then(res => {
+            if (!res.ok) {
+                throw new Error('Failed to load Blas de Lezo biography');
+            }
+            return res.text();
+        });
+    }
+    return blasBiographyPromise;
+};
 
 const timelineSchema = {
     type: Type.OBJECT,
@@ -84,7 +94,11 @@ export const generateTimelineData = async (character: string, lang: Language): P
 
     // Use detailed RAG context if the character is Blas de Lezo
     if (character.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes('blas de lezo')) {
-        ragContext = BLAS_DE_LEZO_BIOGRAPHY;
+        try {
+            ragContext = await getBlasDeLezoBiography();
+        } catch (error) {
+            console.error('Error loading Blas de Lezo biography:', error);
+        }
     }
 
     const prompt = GEMINI_PROMPT_PROTOCOL
