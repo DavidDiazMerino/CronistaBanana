@@ -6,6 +6,15 @@
 
 This contains everything you need to run your app locally.
 
+## Demo
+
+![App demo](https://placehold.co/600x400?text=App%20demo)
+
+Introduce un personaje histórico → genera línea real → explora divergencias.
+
+- [Video demo](https://example.com/demo.mp4)
+- [GIF demo](https://example.com/demo.gif)
+
 View your app in AI Studio: https://ai.studio/apps/drive/1xe_qn3mbeTn8-kGWehlBWvAD47oKQyTb
 
 ## Run Locally
