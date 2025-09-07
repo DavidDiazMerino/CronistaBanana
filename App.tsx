@@ -6,6 +6,8 @@ import { translations, type Translation } from './i18n';
 import Spinner from './components/Spinner';
 import ImageSkeleton from './components/ImageSkeleton';
 import { ClockIcon, BranchIcon, HistoryIcon } from './components/Icons';
+import esFlag from './assets/es.svg';
+import gbFlag from './assets/gb.svg';
 
 const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading: boolean; t: Translation }> = ({ onGenerate, isLoading, t }) => {
     const [character, setCharacter] = useState('Blas de Lezo');
@@ -330,7 +332,11 @@ const App: React.FC = () => {
                     className="px-3 py-1 bg-gray-800 rounded text-sm border border-gray-600 hover:border-cyan-400 transition-colors"
                     aria-label={language === 'es' ? t.switchToEnglish : t.switchToSpanish}
                 >
-                    {language === 'es' ? 'EN' : 'ES'}
+                    <img
+                        src={language === 'es' ? esFlag : gbFlag}
+                        alt={language === 'es' ? 'Bandera de España' : 'Bandera del Reino Unido'}
+                        className="w-6 h-4 rounded"
+                    />
                 </button>
             </div>
             <main className="container mx-auto px-4 py-12">
