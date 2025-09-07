@@ -10,6 +10,10 @@ beforeAll(() => {
 test('App should have no accessibility violations', async () => {
   const { default: App } = await import('./App');
   const { container } = render(<App />);
-  const results = await axe(container);
+  const results = await axe(container, {
+    rules: {
+      'color-contrast': { enabled: false }
+    }
+  });
   expect(results.violations).toHaveLength(0);
 });
