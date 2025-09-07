@@ -64,18 +64,6 @@ const App: React.FC = () => {
     const [language, setLanguage] = useState<Language>('es');
     const t = translations[language];
 
-    const waitingMessages = {
-        real: [
-            'Viajando al pasado para recuperar datos perdidos…',
-            'Consultando archivos polvorientos de la historia…',
-            'Convenciendo a cronistas gruñones para que hablen…',
-        ],
-        alternative: [
-            'Abriendo portales al multiverso…',
-            'Interrogando a viajeros temporales indiscretos…',
-            'Negociando con realidades paralelas…',
-        ],
-    };
     const [loadingMessage, setLoadingMessage] = useState('');
 
     useEffect(() => {
@@ -85,14 +73,14 @@ const App: React.FC = () => {
             return;
         }
         let index = 0;
-        const messages = waitingMessages[active];
+        const messages = t.waitingMessages[active];
         setLoadingMessage(messages[0]);
         const interval = setInterval(() => {
             index = (index + 1) % messages.length;
             setLoadingMessage(messages[index]);
         }, 3000);
         return () => clearInterval(interval);
-    }, [isLoading, isAlternativeLoading]);
+    }, [isLoading, isAlternativeLoading, t]);
 
     useEffect(() => {
         if (activeAlternativeTimeline) {

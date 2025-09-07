@@ -23,6 +23,10 @@ export interface Translation {
   imageProgress: (current: number, total: number) => string;
   switchToEnglish: string;
   switchToSpanish: string;
+  waitingMessages: {
+    real: string[];
+    alternative: string[];
+  };
 }
 
 export const translations: Record<Language, Translation> = {
@@ -60,6 +64,18 @@ export const translations: Record<Language, Translation> = {
     imageProgress: (current, total) => `Imágenes generadas: ${current} de ${total}`,
     switchToEnglish: 'Cambiar a inglés',
     switchToSpanish: 'Cambiar a español',
+    waitingMessages: {
+      real: [
+        'Viajando al pasado para recuperar datos perdidos…',
+        'Consultando archivos polvorientos de la historia…',
+        'Convenciendo a cronistas gruñones para que hablen…',
+      ],
+      alternative: [
+        'Abriendo portales al multiverso…',
+        'Interrogando a viajeros temporales indiscretos…',
+        'Negociando con realidades paralelas…',
+      ],
+    },
   },
   en: {
     appTitle: 'Counterfactual Chronicler',
@@ -95,5 +111,17 @@ export const translations: Record<Language, Translation> = {
     imageProgress: (current, total) => `Images generated: ${current} of ${total}`,
     switchToEnglish: 'Switch to English',
     switchToSpanish: 'Switch to Spanish',
+    waitingMessages: {
+      real: [
+        'Traveling to the past to retrieve lost data…',
+        'Consulting dust-covered historical archives…',
+        'Coaxing grumpy chroniclers to talk…',
+      ],
+      alternative: [
+        'Opening portals to the multiverse…',
+        'Questioning indiscreet time travelers…',
+        'Negotiating with parallel realities…',
+      ],
+    },
   },
 };
