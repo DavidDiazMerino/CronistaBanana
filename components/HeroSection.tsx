@@ -20,7 +20,7 @@ const HeroSection: React.FC<{ onGenerate: (character: string) => void; isLoading
     };
 
     return (
-        <div className="text-center p-8 bg-parchment/50 rounded-lg shadow-2xl shadow-accent/10 backdrop-blur-sm">
+        <div className="text-center p-8 bg-parchment/50 rounded-lg shadow-2xl shadow-accent/10 backdrop-blur-sm transition-transform duration-700 ease-out hover:scale-[1.02]">
             <h1 className="text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-200 mb-4">{t.appTitle}</h1>
             <p className="font-sans text-lg text-sepia mb-6">{t.appDescription}</p>
 

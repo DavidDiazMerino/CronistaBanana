@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useReducer } from 'react';
+import React, { useState, useCallback, useEffect, useReducer, useRef } from 'react';
 import type { FullTimelineData, AlternativeTimelineEvent, DivergencePoint, Language } from './types';
 import { generateTimelineData, generateAlternativeTimeline } from './services/geminiService';
 import { loadEventImages } from './utils/imageLoader';
@@ -58,11 +58,37 @@ function reducer(state: AppState, action: Action): AppState {
     }
 }
 
+function useFadeInOnView() {
+    const elementsRef = useRef<HTMLElement[]>([]);
+
+    useEffect(() => {
+        if (typeof IntersectionObserver === 'undefined') return;
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        elementsRef.current.forEach(el => observer.observe(el));
+        return () => observer.disconnect();
+    }, []);
+
+    const setRef = useCallback((el: HTMLElement | null) => {
+        if (el) elementsRef.current.push(el);
+    }, []);
+
+    return setRef;
+}
+
 const App: React.FC = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const { characterName, timelineData, images, isLoading, imageLoading, error, activeAlternativeTimeline, isAlternativeLoading, imageProgress } = state;
     const [language, setLanguage] = useState<Language>('es');
     const t = translations[language];
+    const observe = useFadeInOnView();
 
     const [loadingMessage, setLoadingMessage] = useState('');
 
@@ -185,17 +211,20 @@ const App: React.FC = () => {
                             <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-sepia to-accent flex items-center justify-center gap-3"><ClockIcon className="w-8 h-8"/> {t.realTimeline}</h2>
                             <div className="relative flex flex-col items-center gap-12">
                                 <TimelineNode isLast={!activeAlternativeTimeline} />
-                                {timelineData.linea_temporal_real.map((event, index) => (
-                                    <EventCard
+                                {timelineData.linea_temporal_real.map(event => (
+                                    <div
                                         key={event.id}
-                                        event={event}
-                                        divergence={timelineData.puntos_divergencia.find(d => d.id === event.id)}
-                                        onShowAlternative={handleShowAlternative}
-                                        t={t}
-                                        className="animate-slide-up"
-                                        style={{ animationDelay: `${index * 150}ms` }}
-                                        {...imageCardProps}
-                                    />
+                                        ref={observe}
+                                        className="opacity-0 transition-opacity duration-700 ease-out"
+                                    >
+                                        <EventCard
+                                            event={event}
+                                            divergence={timelineData.puntos_divergencia.find(d => d.id === event.id)}
+                                            onShowAlternative={handleShowAlternative}
+                                            t={t}
+                                            {...imageCardProps}
+                                        />
+                                    </div>
                                 ))}
                             </div>
                         </section>
@@ -218,17 +247,20 @@ const App: React.FC = () => {
                                 <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-accent to-sepia flex items-center justify-center gap-3"><HistoryIcon className="w-8 h-8"/> {t.alternativeTimeline}</h2>
                                 <div className="relative flex flex-col items-center gap-12">
                                     <TimelineNode isLast={true} />
-                                    {activeAlternativeTimeline.map((event, index) => (
-                                        <EventCard
+                                    {activeAlternativeTimeline.map(event => (
+                                        <div
                                             key={event.id}
-                                            event={event}
-                                            onShowAlternative={() => {}}
-                                            isAlternative={true}
-                                            t={t}
-                                            className="animate-slide-up"
-                                            style={{ animationDelay: `${index * 150}ms` }}
-                                            {...imageCardProps}
-                                        />
+                                            ref={observe}
+                                            className="opacity-0 transition-opacity duration-700 ease-out"
+                                        >
+                                            <EventCard
+                                                event={event}
+                                                onShowAlternative={() => {}}
+                                                isAlternative={true}
+                                                t={t}
+                                                {...imageCardProps}
+                                            />
+                                        </div>
                                     ))}
                                 </div>
                             </section>
