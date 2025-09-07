@@ -104,6 +104,42 @@ const App: React.FC = () => {
     const [language, setLanguage] = useState<Language>('es');
     const t = translations[language];
 
+    const waitingMessages = {
+        real: [
+            'Viajando al pasado para recuperar datos perdidos…',
+            'Consultando archivos polvorientos de la historia…',
+            'Convenciendo a cronistas gruñones para que hablen…',
+        ],
+        alternative: [
+            'Abriendo portales al multiverso…',
+            'Interrogando a viajeros temporales indiscretos…',
+            'Negociando con realidades paralelas…',
+        ],
+    };
+    const [loadingMessage, setLoadingMessage] = useState('');
+
+    useEffect(() => {
+        const active = isLoading ? 'real' : isAlternativeLoading ? 'alternative' : null;
+        if (!active) {
+            setLoadingMessage('');
+            return;
+        }
+        let index = 0;
+        const messages = waitingMessages[active];
+        setLoadingMessage(messages[0]);
+        const interval = setInterval(() => {
+            index = (index + 1) % messages.length;
+            setLoadingMessage(messages[index]);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [isLoading, isAlternativeLoading]);
+
+    useEffect(() => {
+        if (activeAlternativeTimeline) {
+            document.getElementById('alternative-timeline')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [activeAlternativeTimeline]);
+
     useEffect(() => {
         document.documentElement.lang = language;
         document.title = t.appTitle;
@@ -199,13 +235,21 @@ const App: React.FC = () => {
             <main className="container mx-auto px-4 py-12">
                 <HeroSection onGenerate={handleGenerateTimeline} isLoading={isLoading} t={t} />
 
-                {isLoading && <div className="mt-12"><Spinner size="lg" /></div>}
+                {isLoading && (
+                    <div className="mt-12 text-center">
+                        <Spinner size="lg" />
+                        <p className="mt-4 text-gray-300 italic">{loadingMessage}</p>
+                    </div>
+                )}
 
                 {error && <div className="mt-12 text-center p-4 bg-red-500/20 text-red-300 rounded-lg">{error}</div>}
 
                 {timelineData && (
                     <div className="mt-16">
-                        <section id="real-timeline">
+                        <section
+                            id="real-timeline"
+                            className={activeAlternativeTimeline ? 'opacity-40 transition-opacity' : ''}
+                        >
                             <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-cyan-300 flex items-center justify-center gap-3"><ClockIcon className="w-8 h-8"/> {t.realTimeline}</h2>
                             <div className="relative flex flex-col items-center gap-12">
                                 <TimelineNode isLast={!activeAlternativeTimeline} />
@@ -222,7 +266,12 @@ const App: React.FC = () => {
                             </div>
                         </section>
 
-                        {isAlternativeLoading && <div className="mt-12"><Spinner size="lg" /></div>}
+                        {isAlternativeLoading && (
+                            <div className="mt-12 text-center">
+                                <Spinner size="lg" />
+                                <p className="mt-4 text-gray-300 italic">{loadingMessage}</p>
+                            </div>
+                        )}
 
                         {activeAlternativeTimeline && (
                             <section id="alternative-timeline" className="mt-16 animate-fade-in">
