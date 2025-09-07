@@ -94,11 +94,34 @@ const TimelineNode: React.FC<{ isLast?: boolean }> = ({ isLast = false }) => (
 );
 
 // Fix: Omit derived props from ImageCard as they are provided within this component.
-const EventCard: React.FC<{ event: TimelineEvent | AlternativeTimelineEvent; divergence?: DivergencePoint; onShowAlternative: (divergence: DivergencePoint) => void; isAlternative?: boolean; t: Translation; } & Omit<React.ComponentProps<typeof ImageCard>, 'eventId' | 'errorText' | 'alt' | 'loadingLabel'>> = ({ event, divergence, onShowAlternative, isAlternative = false, t, ...imageProps }) => {
+const EventCard: React.FC<{
+    event: TimelineEvent | AlternativeTimelineEvent;
+    divergence?: DivergencePoint;
+    onShowAlternative: (divergence: DivergencePoint) => void;
+    isAlternative?: boolean;
+    t: Translation;
+} &
+    Omit<
+        React.ComponentProps<typeof ImageCard>,
+        'eventId' | 'errorText' | 'alt' | 'loadingLabel'
+    > &
+    React.HTMLAttributes<HTMLDivElement>> = ({
+    event,
+    divergence,
+    onShowAlternative,
+    isAlternative = false,
+    t,
+    className = '',
+    style,
+    ...imageProps
+}) => {
     const title = 'titulo' in event ? event.titulo : event.titulo_eco;
 
     return (
-        <div className="relative group w-full lg:w-2/3 mx-auto p-4">
+        <div
+            className={`relative group w-full lg:w-2/3 mx-auto p-4 ${className}`}
+            style={style}
+        >
             <div className="bg-gray-800/30 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-6 transition-all duration-300 hover:border-cyan-400/50 hover:shadow-cyan-500/10">
                 <h3 className="text-2xl font-bold text-cyan-300 mb-2">{title}</h3>
                 <p className="text-gray-300 mb-4">{event.descripcion_corta}</p>
@@ -337,13 +360,15 @@ const App: React.FC = () => {
                             <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-cyan-300 flex items-center justify-center gap-3"><ClockIcon className="w-8 h-8"/> {t.realTimeline}</h2>
                             <div className="relative flex flex-col items-center gap-12">
                                 <TimelineNode isLast={!activeAlternativeTimeline} />
-                                {timelineData.linea_temporal_real.map((event) => (
+                                {timelineData.linea_temporal_real.map((event, index) => (
                                     <EventCard
                                         key={event.id}
                                         event={event}
                                         divergence={timelineData.puntos_divergencia.find(d => d.id === event.id)}
                                         onShowAlternative={handleShowAlternative}
                                         t={t}
+                                        className="animate-slide-up"
+                                        style={{ animationDelay: `${index * 150}ms` }}
                                         {...imageCardProps}
                                     />
                                 ))}
@@ -368,13 +393,15 @@ const App: React.FC = () => {
                                 <h2 className="text-4xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400 flex items-center justify-center gap-3"><HistoryIcon className="w-8 h-8"/> {t.alternativeTimeline}</h2>
                                 <div className="relative flex flex-col items-center gap-12">
                                     <TimelineNode isLast={true} />
-                                    {activeAlternativeTimeline.map(event => (
+                                    {activeAlternativeTimeline.map((event, index) => (
                                         <EventCard
                                             key={event.id}
                                             event={event}
                                             onShowAlternative={() => {}}
                                             isAlternative={true}
                                             t={t}
+                                            className="animate-slide-up"
+                                            style={{ animationDelay: `${index * 150}ms` }}
                                             {...imageCardProps}
                                         />
                                     ))}
