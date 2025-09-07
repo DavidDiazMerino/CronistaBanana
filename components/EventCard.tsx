@@ -39,7 +39,7 @@ const EventCard: React.FC<EventCardProps> = ({
 
     return (
         <div
-            className={`relative group w-full lg:w-2/3 mx-auto p-4 ${className}`}
+            className={`relative group w-full lg:w-2/3 mx-auto p-4 transition-transform duration-700 ease-out hover:scale-[1.02] ${className}`}
             style={style}
         >
             <div className="bg-parchment/30 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-6 transition-all duration-300 hover:border-accent/50 hover:shadow-accent/10">
